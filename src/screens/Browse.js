@@ -1,7 +1,8 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-import { Button, Block, Text } from "../components";
-import { theme } from '../constants';
+import React, { Component } from 'react'
+import { Dimensions, Image, StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
+
+import { Card, Badge, Button, Block, Text } from '../components';
+import { theme, mocks } from '../constants';
 
 export default function Browse() {
   return (

@@ -29,7 +29,7 @@ export default function Login() {
     if(email !== VALID_EMAIL) {
       errors.push('email');
     }
-    if(email !== VALID_PASSWORD) {
+    if(password !== VALID_PASSWORD) {
       errors.push('password');
     }
 
