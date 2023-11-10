@@ -1,20 +1,59 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useEffect } from "react";
+import { StatusBar } from "expo-status-bar";
+import { StyleSheet, Text, View, Image } from "react-native";
+import { createStackNavigator } from "@react-navigation/stack";
+import { NavigationContainer } from "@react-navigation/native";
+import { theme } from "./src/constants";
+import SplashScreen from "./src/screens/Splash";
+import Welcome from "./src/screens/Welcome";
+import Forgot from "./src/screens/Forgot";
+import Login from "./src/screens/Login";
+import SignUp from "./src/screens/SignUp";
+import Browse from "./src/screens/Browse";
+
+const Stack = createStackNavigator();
+
+const UnShowHeader = {
+  headerShown: false,
+};
+
+const UnShowHeaderTitle = {
+  title: '',
+}
+
+const StackOptions = {
+  headerStyle: {
+    height: theme.sizes.base * 4,
+    backgroundColor: theme.colors.white,
+    borderBottomColor: "transparent",
+    elevation: 0,
+  },
+  headerBackImage: () => <Image source={require('./src/icons/back.png')} />,
+  headerBackTitle: null,
+  headerLeftContainerStyle: {
+    alignItems: 'center',
+    marginLeft: theme.sizes.base * 2,
+    paddingRight: theme.sizes.base,
+  },
+  headerRightContainerStyle: {
+    alignItems: 'center',
+    paddingRight: theme.sizes.base,
+  },
+};
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator screenOptions={StackOptions} >
+        <Stack.Screen name="Splash" component={SplashScreen} options={UnShowHeader} />
+        <Stack.Screen name="Welcome" component={Welcome} options={UnShowHeader} />
+        <Stack.Screen name="Login" component={Login} options={UnShowHeaderTitle} />
+        <Stack.Screen name="Forgot" component={Forgot} options={UnShowHeaderTitle} />
+        <Stack.Screen name="SignUp" component={SignUp} options={UnShowHeaderTitle} />
+        <Stack.Screen name="Browse" component={Browse} options={UnShowHeaderTitle} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+const styles = StyleSheet.create({});
