@@ -10,6 +10,9 @@ import Forgot from "./src/screens/Forgot";
 import Login from "./src/screens/Login";
 import SignUp from "./src/screens/SignUp";
 import Browse from "./src/screens/Browse";
+import Explore from "./src/screens/Explore";
+import Settings from "./src/screens/Settings";
+
 
 const Stack = createStackNavigator();
 
@@ -51,6 +54,8 @@ export default function App() {
         <Stack.Screen name="Forgot" component={Forgot} options={UnShowHeaderTitle} />
         <Stack.Screen name="SignUp" component={SignUp} options={UnShowHeaderTitle} />
         <Stack.Screen name="Browse" component={Browse} options={UnShowHeaderTitle} />
+        <Stack.Screen name="Settings" component={Settings} options={UnShowHeaderTitle} />
+        <Stack.Screen name="Explore" component={Explore} options={UnShowHeaderTitle} />
       </Stack.Navigator>
     </NavigationContainer>
   );
