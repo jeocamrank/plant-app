@@ -10,7 +10,7 @@ const SplashScreen = () => {
     setTimeout(() => {
       setIsLoading(false);
       navigation.replace('Welcome');
-    }, 3000); // Splash screen will be visible for 3 seconds
+    }, 3000);
   }, [navigation]);
 
   if (isLoading) {
