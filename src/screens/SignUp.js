@@ -1,95 +1,79 @@
 import React, { useState } from 'react';
-import { Alert, ActivityIndicator, Keyboard, KeyboardAvoidingView, StyleSheet } from 'react-native';
+import { Alert, ActivityIndicator, Keyboard, KeyboardAvoidingView, StyleSheet, TouchableWithoutFeedback } from 'react-native';
 
 import { Button, Block, Input, Text } from '../components';
 import { theme } from '../constants';
+import { FIREBASE_AUTH } from '../constants/firebase';
+import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 
 export default function SignUp({ navigation }) {
-  const [email, setEmail] = useState(null);
-  const [username, setUsername] = useState(null);
-  const [password, setPassword] = useState(null);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(false);
+  const auth = FIREBASE_AUTH;
 
-  const handleSignUp = () => {
-    Keyboard.dismiss();
+  const handleSignUp = async () => {
     setLoading(true);
-
-    const errors = [];
-    if (!email) errors.push('email');
-    if (!username) errors.push('username');
-    if (!password) errors.push('password');
-
-    setErrors(errors);
-    setLoading(false);
-
-    if (!errors.length) {
-      Alert.alert(
-        'Success!',
-        'Your account has been created',
-        [
-          {
-            text: 'Continue',
-            onPress: () => {
-              navigation.navigate('Browse');
-            },
-          },
-        ],
-        { cancelable: false }
-      );
+    try {
+      const response = await createUserWithEmailAndPassword(auth, email, password);
+      console.log(response);
+      await sendEmailVerification(auth.currentUser);
+      Alert.alert('Check your email!');
+      navigation.navigate('Login'); // Chuyển đến trang SignIn sau khi đăng ký thành công
+    } catch (error) {
+      console.log(error);
+      setErrors([...errors, error.code]);
+      alert('Sign up failed: ' + error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   const hasErrors = key => (errors.includes(key) ? styles.hasErrors : null);
 
   return (
-    <KeyboardAvoidingView style={styles.signup} behavior="padding">
-      <Block padding={[0, theme.sizes.base * 2]}>
-        <Text h1 bold>
-          Sign Up
-        </Text>
-        <Block middle>
-          <Input
-            email
-            label="Email"
-            error={hasErrors('email')}
-            style={[styles.input, hasErrors('email')]}
-            defaultValue={email}
-            onChangeText={text => setEmail(text)}
-          />
-          <Input
-            label="Username"
-            error={hasErrors('username')}
-            style={[styles.input, hasErrors('username')]}
-            defaultValue={username}
-            onChangeText={text => setUsername(text)}
-          />
-          <Input
-            secure
-            label="Password"
-            error={hasErrors('password')}
-            style={[styles.input, hasErrors('password')]}
-            defaultValue={password}
-            onChangeText={text => setPassword(text)}
-          />
-          <Button gradient onPress={() => handleSignUp()}>
-            {loading ? (
-              <ActivityIndicator size="small" color="white" />
-            ) : (
-              <Text bold white center>
-                Sign Up
-              </Text>
-            )}
-          </Button>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <KeyboardAvoidingView style={styles.signup} behavior="height">
+        <Block padding={[0, theme.sizes.base * 2]}>
+          <Text h1 bold>
+            Sign Up
+          </Text>
+          <Block middle>
+            <Input
+              label="Email"
+              error={hasErrors('email')}
+              style={[styles.input, hasErrors('email')]}
+              defaultValue={email}
+              onChangeText={text => setEmail(text)}
+            />
+            <Input
+              secure
+              label="Password"
+              error={hasErrors('password')}
+              style={[styles.input, hasErrors('password')]}
+              defaultValue={password}
+              onChangeText={text => setPassword(text)}
+            />
+            <Button gradient onPress={() => handleSignUp()}>
+              {loading ? (
+                <ActivityIndicator size="small" color="white" />
+              ) : (
+                <Text bold white center>
+                  Sign Up
+                </Text>
+              )}
+            </Button>
 
-          <Button onPress={() => navigation.navigate('Login')}>
-            <Text gray caption center style={{ textDecorationLine: 'underline' }}>
-              Back to Login
-            </Text>
-          </Button>
+            <Button onPress={() => navigation.navigate('Login')}>
+              <Text gray caption center style={{ textDecorationLine: 'underline' }}>
+                Back to Login
+              </Text>
+            </Button>
+          </Block>
         </Block>
-      </Block>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 }
 

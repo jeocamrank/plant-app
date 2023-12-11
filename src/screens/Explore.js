@@ -22,6 +22,7 @@ export default function Explore({ images, navigation }) {
     Animated.timing(searchFocus, {
       toValue: status ? 0.8 : 0.6,
       duration: 150,
+      useNativeDriver: false, // hoặc true tùy thuộc vào trường hợp sử dụng
     }).start();
   };
 

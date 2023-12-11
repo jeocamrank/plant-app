@@ -3,50 +3,26 @@ import { Alert, ActivityIndicator, Keyboard, KeyboardAvoidingView, StyleSheet } 
 
 import { Button, Block, Input, Text } from '../components';
 import { theme } from '../constants';
-
-const VALID_EMAIL = 'tung@gmail.com';
+import { FIREBASE_AUTH } from '../constants/firebase';
+import { sendPasswordResetEmail } from 'firebase/auth';
 
 export default function Forgot({ navigation }) {
-  const [email, setEmail] = useState(VALID_EMAIL);
+  const [email, setEmail] = useState('');
   const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(false);
+  const auth = FIREBASE_AUTH;
 
-  const handleForgot = () => {
-    Keyboard.dismiss();
+  const handleForgot = async () => {
     setLoading(true);
-
-    // Check with backend API or with some static data
-    if (email !== VALID_EMAIL) {
-      setErrors(['email']);
-    }
-
-    setLoading(false);
-
-    if (!errors.length) {
-      Alert.alert(
-        'Password sent!',
-        'Please check your email.',
-        [
-          {
-            text: 'OK',
-            onPress: () => {
-              navigation.navigate('Login');
-            },
-          },
-        ],
-        { cancelable: false }
-      );
-    } else {
-      Alert.alert(
-        'Error',
-        'Please check your email address.',
-        [
-          {
-            text: 'Try again',
-          },
-        ],
-        { cancelable: false }
-      );
+    try {
+      await sendPasswordResetEmail(auth, email);  // Gửi email đặt lại mật khẩu
+      Alert.alert('Password reset email sent. Please check your email.');
+      navigation.navigate('Login');
+    } catch (error) {
+      console.log(error);
+      Alert.alert('Forgot password failed: ' + error.message);
+    } finally {
+      setLoading(false);
     }
   };
 

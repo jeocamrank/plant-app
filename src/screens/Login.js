@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
 import {
+  Alert,
   ActivityIndicator,
   Keyboard,
   KeyboardAvoidingView,
@@ -9,37 +10,54 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { Button, Block, Input, Text } from "../components";
 import { theme } from "../constants";
-
-const VALID_EMAIL = "tung@gmail.com";
-const VALID_PASSWORD = "tungdeptraivl";
+import { FIREBASE_AUTH } from '../constants/firebase';
+import { signInWithEmailAndPassword, isVerifiedEmail, onAuthStateChanged } from "firebase/auth";
 
 export default function Login() {
-  const [email, setEmail] = useState(VALID_EMAIL);
-  const [password, setPassword] = useState(VALID_PASSWORD);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
+  const auth = FIREBASE_AUTH;
 
-  const handleLogin = () => {
-    const errors = [];
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        if (!user.emailVerified) {
+          Alert.alert('Email is not verified. Please check your email and verify your account.');
+        } else {
+          navigation.navigate('Browse');
+        }
+      }
+    });
 
-    Keyboard.dismiss();
-    setLoading(true);
+    return () => unsubscribe();
+  }, [navigation]);
 
-    if(email !== VALID_EMAIL) {
-      errors.push('email');
+  const handleLogin = async () => {
+  setLoading(true);
+  try {
+    const response = await signInWithEmailAndPassword(auth, email, password);
+    console.log(response);
+    
+    const user = auth.currentUser;
+    
+    if (user) {
+      if (user.emailVerified) {
+        navigation.navigate('Browse');
+      } else {
+        await sendEmailVerification(user);
+        Alert.alert('Email is not verified. Please check your email and verify your account.');
+      }
     }
-    if(password !== VALID_PASSWORD) {
-      errors.push('password');
-    }
-
-    setErrors(errors);
+  } catch (error) {
+    console.log(error);
+    Alert.alert('Sign in failed: ' + error.message);
+  } finally {
     setLoading(false);
-
-    if(!errors.length) {
-      navigation.navigate('Browse');
-    }
   }
+};
 
   const hasErrors = (key) => (errors.includes(key) ? styles.hasErrors : null);
 
